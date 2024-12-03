@@ -1,3 +1,4 @@
+package IntegrationTests;
 
 
 import static org.junit.Assert.*;
