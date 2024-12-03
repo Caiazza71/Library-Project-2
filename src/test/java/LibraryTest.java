@@ -1,10 +1,6 @@
-
-
-import static org.junit.Assert.*;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -13,112 +9,103 @@ import com.Book;
 import com.Library;
 import com.User;
 import java.util.List;
+
+
 public class LibraryTest {
-	private Library library;
-	private Book book1;
-	private Book book2;
-	private Book book3;
-	private Book book4;
-	private User user1;
-	private User user2;
+	Library classlibrary;
+	Book book1;
+	Book book2;
+	Book book3;
+	User user1;
+	User user2;
 
 	@Before
-	public void setUp() {
-		library = new Library();
+	public void createLibrary() {
+		classlibrary = new Library();
 		
 		// Fake books
-		book1 = new Book("Java Programming", "Author A", "ISBN123");
-		book2 = new Book("Data Structures", "Author B", "ISBN456");
-		book3 = new Book("Software Testing", "Author C", "ISBN789");
-		book4 = new Book("Auto Testing", "Author D", "ISBN321");
+		book1 = new Book("Book 1", "Author A", "123");
+		book2 = new Book("Book 2", "Author B", "456");
+		book3 = new Book("Book 3", "Author C", "789");
 		
 		// Fake users
-		user1 = new User("U001", "John");
-		user2 = new User("U002", "Max");
+		user1 = new User("John", "U001");
+		user2 = new User("Maxwell", "U002");
 		
-		library.addBook(book1);
-		library.addBook(book2);
-		library.addBook(book3);
-		library.addBook(book4);
-		library.registerUser(user1);
-		library.registerUser(user2);
+		classlibrary.registerUser(user1);
+		classlibrary.registerUser(user2);
+		classlibrary.addBook(book1);
+		classlibrary.addBook(book2);
 	}
 	
 	@Test
 	public void testAddBook() {
-		Book book5 = new Book("Why Mercedes Sucks", "Author E", "ISBN654");
-		library.addBook(book5);
-		
-		// Assert Equals
-		assertEquals(5, library.getTotalNumberOfBooks());
+		assertEquals(2, classlibrary.getTotalNumberOfBooks());
 	}
 	
+	@Test
+	public void testRegisterUser(){
+		classlibrary.registerUser(user1);
+		classlibrary.registerUser(user2);
+		
+		// No way to assert that users can be added ?
+	}
+	
+	@Test
+	public void testAvailableBooks() {
+		classlibrary.displayAvailableBooks();
+		Assert.assertNotNull(classlibrary.getAvailableBooks());
+	}
 	
 	@Test
 	public void testBorrowBook() {
-        // Borrow a book
-        library.borrowBook("U001", "ISBN123");
-
-        // Check that the book is in the user's borrowed list
-        assertTrue( "The borrowed book should be in the user's list.", user1.getBorrowedBooks().contains(book1));
-
-        // Indirectly verify book availability by checking the available books list
-        List<Book> availableBooks = library.getAvailableBooks();
-        assertFalse("The borrowed book should not be in the available books list.", availableBooks.contains(book1));
+		//Borrow a Book
+		Assert.assertNotNull(book1);
+		classlibrary.borrowBook(user1.getUserId(), book1.getIsbn());
+        Assert.assertFalse(book1.isAvailable());
+        
+        // First input is NULL
+        IllegalStateException thrown = Assert.assertThrows(IllegalStateException.class, () -> {classlibrary.borrowBook(null,"0001");});
+        Assert.assertEquals("User or Book not found", thrown.getMessage());
+        
+        // Second input is NULL
+        thrown = Assert.assertThrows(IllegalStateException.class, () -> {classlibrary.borrowBook("0001", null);});
+        Assert.assertEquals("User or Book not found", thrown.getMessage());
     }
 	
 	@Test
 	public void testReturnBook() {
-	    // Borrow a book first
-	    library.borrowBook("U001", "ISBN123");
-
-	    // Assert that the book is now borrowed by the user
-	    assertTrue("The user should have borrowed the book.", user1.getBorrowedBooks().contains(book1));
-
-	    // Return the book
-	    library.returnBook("U001", "ISBN123");
-
-	    // Assert that the book is now available again
-	    List<Book> availableBooks = library.getAvailableBooks();
-	    assertTrue("The returned book should be in the available books list.", availableBooks.contains(book1));
-
-	    // Assert that the user's borrowed books list is empty
-	    assertTrue("The user should not have borrowed any books.", user1.getBorrowedBooks().isEmpty());
+		//return a Book
+		Assert.assertNotNull(book1);
+		classlibrary.borrowBook(user1.getUserId(), book1.getIsbn());
+		classlibrary.returnBook(user1.getUserId(), book1.getIsbn());
+        Assert.assertTrue(book1.isAvailable());
+        
+        // First input is NULL
+        IllegalStateException thrown = Assert.assertThrows(IllegalStateException.class, () -> {classlibrary.returnBook(null,"0001");});
+        Assert.assertEquals("User or Book not found", thrown.getMessage());
+        
+        // Second input is NULL
+        thrown = Assert.assertThrows(IllegalStateException.class, () -> {classlibrary.returnBook("0001", null);});
+        Assert.assertEquals("User or Book not found", thrown.getMessage());
+	}
+	
+	@Test
+	public void testGetTotalBorrowedBooks() {
+		Assert.assertEquals(0, classlibrary.getTotalBorrowedBooks());
+		
+		classlibrary.borrowBook(user1.getUserId(), book1.getIsbn());
+		Assert.assertEquals(1, classlibrary.getTotalBorrowedBooks());
 	}
 
-	
-	
 	@Test
 	public void testGetAvailableBooks() {
-	    // Borrow a book
-	    library.borrowBook("U001", "123");
-
-	    //  available books
-	    List<Book> availableBooks = library.getAvailableBooks();
-
-	    // Verify the number of available books
-	    assertEquals("Only one book should be available after borrowing one.", 1, availableBooks.size());
-
-	    // Verify the correct book is available
-	    assertEquals("456", availableBooks.get(0).getIsbn(), "The available book should have ISBN '456'.");
-	}
-	
-	@Test
-	public void testInvalidBorrow() {
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
-            library.borrowBook("U999", "999");
-        });
-        
-        // Assert That
-        assertTrue(exception.getMessage().contains("User or Book not found"));
-	}
-	
-	@Test
-	public void testNullUser() {
-		User nullUser = null;
+		// Asserting Empty Library condition
+		Library newLib = new Library();
+		Assert.assertEquals(0.0, newLib.getAverageBooksPerUser(),0.0);
 		
-		/// Assert Null
-		assertNull(nullUser);
+	    // Normal Condition
+		Assert.assertNotNull(classlibrary.getAverageBooksPerUser());
+		
 	}
-	
 }
