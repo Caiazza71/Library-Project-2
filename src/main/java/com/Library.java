@@ -1,11 +1,11 @@
-package library_test_project;
+package com;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Library {
+public class Library {
     private List<Book> books;
     private Map<String, User> users;
 

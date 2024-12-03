@@ -1,10 +1,10 @@
-package library_test_project;
+package com;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // User class
-class User {
+public class User {
     private String name;
     private String userId;
     private List<Book> borrowedBooks;
