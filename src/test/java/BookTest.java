@@ -1,14 +1,8 @@
-
-
-import static org.junit.Assert.*;
 import org.junit.Assert;
-
-
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 import com.Book;
+
 
 public class BookTest {
 	Book classBook;
@@ -43,6 +37,11 @@ public class BookTest {
 		//Asserting the book was borrowed
 		classBook.borrowBook();
 		Assert.assertFalse(classBook.isAvailable());
+		
+		//Asserting Past the Thrown exception
+		IllegalStateException thrown = Assert.assertThrows(IllegalStateException.class, () -> {classBook.borrowBook();});
+
+        Assert.assertEquals("Book is not available for borrowing", thrown.getMessage());
 		
 		//Asserting the Book was returned
 		classBook.returnBook();
