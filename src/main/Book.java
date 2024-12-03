@@ -1,4 +1,4 @@
-package project;
+package library_test_project;
 
 //Book class
 class Book {

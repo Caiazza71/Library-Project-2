@@ -1,4 +1,4 @@
-package project;
+package library_test_project;
 
 import java.util.ArrayList;
 import java.util.HashMap;

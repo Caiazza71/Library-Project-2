@@ -1,4 +1,4 @@
-package project;
+package library_test_project;
 
 public class LibraryManagementSystemMain {
     public static void main(String[] args) {
